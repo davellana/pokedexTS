@@ -1,4 +1,5 @@
 import * as Models from "./models.js";
+import {BasePokemon} from "./models.js";
 
 // ==========================================================
 // PART A: FUNCIONS JA IMPLEMENTADES (no cal modificar-les)
@@ -96,6 +97,16 @@ export function reproduirCrit(soundUrl: string): void {
  */
 // TODO: Implementa la lògica de l'exercici 1 seguint els requisits
 
+export function renderitzarLlistaNoms(llista: Models.BasePokemon[]) {
+    let pokeLista = document.getElementById("pokemon-list") as HTMLUListElement
+    pokeLista.innerHTML = ""
+
+    for (let e of llista) {
+        let li:HTMLLIElement = document.createElement("li")
+        li.innerHTML = "<strong>" + e.formattedId + "</strong> - " + e.displayName
+        pokeLista.appendChild(li)
+    }
+}
 
 /**
  * EXERCICI 3

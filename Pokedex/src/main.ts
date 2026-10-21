@@ -1,8 +1,48 @@
+import * as Models from "./models.js";
+import * as Utils from "./utils.js";
+import {BasePokemon} from "./models.js";
+
 // ==========================================================
 // EXERCICI 1: Llistar els 151 Pokémon
 // ==========================================================
 // TODO: Implementa la lògica de l'exercici 1 seguint els requisits
+const mapaPokemon = new Map<number, Models.BasePokemon>();
 
+let btnCarregar = document.getElementById("btn-show-all") as HTMLButtonElement
+
+async function carregarLlistaPokemon() {
+    Utils.mostrarEstat("Carregant Pokemons", "loading")
+
+    try {
+        const resposta = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151")
+
+        if (!resposta.ok) {
+            throw new Error(`Error HTTP: ${resposta.status}`)
+        }
+
+        const results:Models.IPokeApiListResponse = await resposta.json() as Models.IPokeApiListResponse
+        //console.log(results.results)
+        let i:number = 0
+        for (let result of results.results) {
+            mapaPokemon.set(i,new BasePokemon(result))
+        }
+
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            Utils.mostrarEstat(error.message, "error")
+        } else {
+            Utils.mostrarEstat("ERROR DESCONOCIDO", "error")
+        }
+    } finally {
+        let pokeLista:BasePokemon[] = []
+
+        for (let e of mapaPokemon) {
+
+        }
+    }
+}
+
+btnCarregar.addEventListener("click", carregarLlistaPokemon)
 
 
 // ==========================================================

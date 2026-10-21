@@ -72,6 +72,41 @@ export const POKEMON_TYPES = {
  *   get url: retorna l'atribut privat corresponent.
  *   get formattedId: retorna l'atribut id en format "#025" (3 xifres, amb zeros a l'esquerra. Pista: padStart).
  */
+export class BasePokemon {
+    _id;
+    _name;
+    _url;
+    constructor(pk) {
+        this._id = parseInt(pk.url.split("/")[6]);
+        this._name = pk.name;
+        this._url = pk.url;
+    }
+    get id() {
+        return this._id;
+    }
+    get name() {
+        return this._name;
+    }
+    get url() {
+        return this._url;
+    }
+    get formattedId() {
+        let s = "";
+        if (this.id < 10) {
+            s += "#00" + this.id;
+        }
+        else if (this.id < 100) {
+            s += "#0" + this.id;
+        }
+        else {
+            s += "#" + this.id;
+        }
+        return s;
+    }
+    get displayName() {
+        return String(this.name).charAt(0).toUpperCase() + String(this.name).slice(1);
+    }
+}
 /**
  * EXERCICI 3: class DetailedPokemon
  *

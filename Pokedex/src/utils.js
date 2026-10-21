@@ -82,6 +82,15 @@ export function reproduirCrit(soundUrl) {
  *  - Afegir el <li> al contenidor amb appendChild.
  */
 // TODO: Implementa la lògica de l'exercici 1 seguint els requisits
+export function renderitzarLlistaNoms(llista) {
+    let pokeLista = document.getElementById("pokemon-list");
+    pokeLista.innerHTML = "";
+    for (let e of llista) {
+        let li = document.createElement("li");
+        li.innerHTML = "<strong>" + e.formattedId + "</strong> - " + e.displayName;
+        pokeLista.appendChild(li);
+    }
+}
 /**
  * EXERCICI 3
  * Renderitza la targeta de detall dins de <div id="pokemon-detail">.
