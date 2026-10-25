@@ -6,8 +6,10 @@ import * as Utils from "./utils.js";
 // TODO: Implementa la lògica de l'exercici 1 seguint els requisits
 const mapaPokemon = new Map();
 let btnCarregar = document.getElementById("btn-show-all");
+let inpBuscar = document.getElementById("search-input");
 async function carregarLlistaPokemon() {
     Utils.mostrarEstat("Carregant Pokemons", "loading");
+    Utils.netejarCercador();
     try {
         const resposta = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
         if (!resposta.ok) {
@@ -45,6 +47,10 @@ btnCarregar.addEventListener("click", carregarLlistaPokemon);
 // EXERCICI 2: Cercador en temps real
 // ==========================================================
 // TODO: Implementa la lògica de l'exercici 2 seguint els requisits
+function canviBuscador() {
+    console.log("canvi");
+}
+inpBuscar.addEventListener("change", canviBuscador);
 // ==========================================================
 // EXERCICI 3: Detall del Pokémon, cache i crit
 // ==========================================================

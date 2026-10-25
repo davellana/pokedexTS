@@ -8,10 +8,11 @@ import * as Utils from "./utils.js";
 const mapaPokemon = new Map<number, Models.BasePokemon>();
 
 let btnCarregar = document.getElementById("btn-show-all") as HTMLButtonElement
+let inpBuscar= document.getElementById("search-input") as HTMLInputElement
 
 async function carregarLlistaPokemon() {
     Utils.mostrarEstat("Carregant Pokemons", "loading")
-
+    Utils.netejarCercador()
     try {
         const resposta = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151")
 
@@ -53,8 +54,11 @@ btnCarregar.addEventListener("click", carregarLlistaPokemon)
 // EXERCICI 2: Cercador en temps real
 // ==========================================================
 // TODO: Implementa la lògica de l'exercici 2 seguint els requisits
+function canviBuscador() {
+    console.log("canvi")
+}
 
-
+inpBuscar.addEventListener("change",canviBuscador)
 
 // ==========================================================
 // EXERCICI 3: Detall del Pokémon, cache i crit
