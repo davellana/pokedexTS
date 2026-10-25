@@ -1,6 +1,5 @@
 import * as Models from "./models.js";
 import * as Utils from "./utils.js";
-import {BasePokemon} from "./models.js";
 
 // ==========================================================
 // EXERCICI 1: Llistar els 151 Pokémon
@@ -24,7 +23,8 @@ async function carregarLlistaPokemon() {
         //console.log(results.results)
         let i:number = 0
         for (let result of results.results) {
-            mapaPokemon.set(i,new BasePokemon(result))
+            mapaPokemon.set(i,new Models.BasePokemon(result))
+            i++;
         }
 
     } catch (error: unknown) {
@@ -34,11 +34,15 @@ async function carregarLlistaPokemon() {
             Utils.mostrarEstat("ERROR DESCONOCIDO", "error")
         }
     } finally {
-        let pokeLista:BasePokemon[] = []
+        //console.log(mapaPokemon)
 
-        for (let e of mapaPokemon) {
-
+        let llistaPokemons:Models.BasePokemon[]=[]
+        for (let pokeElem of mapaPokemon.values()) {
+            llistaPokemons.push(pokeElem)
         }
+        //console.log(llistaPokemons)
+        Utils.renderitzarLlistaNoms(llistaPokemons)
+        Utils.amagarEstat()
     }
 }
 
