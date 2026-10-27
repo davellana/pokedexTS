@@ -143,4 +143,20 @@ export class BasePokemon {
  *   get types: retorna un array d'objectes PokemonType
  *   get stats: retorna un array de type Stat
  */
+export class DetailedPokemon extends BasePokemon {
+    _weightKg;
+    _imageUrl;
+    _types;
+    _stats;
+    _cryUrl;
+    constructor(data, url) {
+        let supercons = { name: data.name, url: url };
+        super(supercons);
+        this._weightKg = data.weight;
+        this._imageUrl = data.sprites.front_default ?? "";
+        this._types = data.types.map(t => t.type.name);
+        this._stats = data.stats.map(s => s.stat.name);
+        this._cryUrl = data.cries?.latest ?? data.cries?.legacy ?? "";
+    }
+}
 //# sourceMappingURL=models.js.map
