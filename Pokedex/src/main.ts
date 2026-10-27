@@ -1,5 +1,6 @@
 import * as Models from "./models.js";
 import * as Utils from "./utils.js";
+import {renderitzarLlistaNoms} from "./utils.js";
 
 // ==========================================================
 // EXERCICI 1: Llistar els 151 Pokémon
@@ -8,7 +9,6 @@ import * as Utils from "./utils.js";
 const mapaPokemon = new Map<number, Models.BasePokemon>();
 
 let btnCarregar = document.getElementById("btn-show-all") as HTMLButtonElement
-let inpBuscar= document.getElementById("search-input") as HTMLInputElement
 
 async function carregarLlistaPokemon() {
     Utils.mostrarEstat("Carregant Pokemons", "loading")
@@ -54,11 +54,38 @@ btnCarregar.addEventListener("click", carregarLlistaPokemon)
 // EXERCICI 2: Cercador en temps real
 // ==========================================================
 // TODO: Implementa la lògica de l'exercici 2 seguint els requisits
+
+let inpBuscar= document.getElementById("search-input") as HTMLInputElement
 function canviBuscador() {
-    console.log("canvi")
+    console.log(inpBuscar.value)
+
+    if (inpBuscar.value === "") {
+        let llistaPokemons:Models.BasePokemon[]=[]
+        for (let pokeElem of mapaPokemon.values()) {
+            llistaPokemons.push(pokeElem)
+        }
+        //console.log(llistaPokemons)
+        Utils.renderitzarLlistaNoms(llistaPokemons)
+    } else if (!isNaN(Number(inpBuscar.value))) {
+        let llistaPokemonsPerId:Models.BasePokemon[]=[]
+        for (let idPoke of mapaPokemon.values()) {
+            if(idPoke.id==Number(inpBuscar.value)) {
+                llistaPokemonsPerId.push(idPoke)
+            }
+        }
+        Utils.renderitzarLlistaNoms(llistaPokemonsPerId)
+    } else {
+        let llistaPokemonsPerNom:Models.BasePokemon[]=[]
+        for (let idPoke of mapaPokemon.values()) {
+            if(idPoke.name.toUpperCase().includes(inpBuscar.value.toUpperCase())) {
+                llistaPokemonsPerNom.push(idPoke)
+            }
+        }
+        Utils.renderitzarLlistaNoms(llistaPokemonsPerNom)
+    }
 }
 
-inpBuscar.addEventListener("change",canviBuscador)
+inpBuscar.addEventListener("input",canviBuscador)
 
 // ==========================================================
 // EXERCICI 3: Detall del Pokémon, cache i crit
