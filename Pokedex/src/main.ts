@@ -59,7 +59,6 @@ btnCarregar.addEventListener("click", carregarLlistaPokemon)
 let inpBuscar= document.getElementById("search-input") as HTMLInputElement
 function canviBuscador() {
     console.log(inpBuscar.value)
-
     if (inpBuscar.value === "") {
         let llistaPokemons:Models.BasePokemon[]=[]
         for (let pokeElem of mapaPokemon.values()) {
@@ -103,7 +102,6 @@ async function carregarDetallPokemon(id: number, url: string): Promise<void> {
             Utils.renderitzarDetallCard(pokemon);
             Utils.amagarEstat();
         }
-
         return;
     }
 
@@ -138,18 +136,18 @@ async function carregarDetallPokemon(id: number, url: string): Promise<void> {
 let llistaPokemon = document.getElementById("pokemon-list");
 
 function seleccionarPokemon(event: MouseEvent): void {
-    const target = event.target;
+    let target = event.target;
 
     if (!(target instanceof HTMLElement)) return;
 
-    const li = target.closest("li");
+    let li = target.closest("li");
 
     if (!li) return;
 
     Utils.marcarItemActiu(li);
 
-    const id = Number(li.dataset.id);
-    const pokemon = mapaPokemon.get(id);
+    let id = Number(li.dataset.id);
+    let pokemon = mapaPokemon.get(id);
 
     if (pokemon) {
         carregarDetallPokemon(id, pokemon.url);
@@ -174,3 +172,38 @@ Utils.generarBotonsTipus();
 // EXERCICI 5: Filtrar la llista per tipus
 // ==========================================================
 // TODO: Implementa la lògica de l'exercici 5 seguint els requisits
+
+let typeFilterContainer=document.getElementById("type-filter-container") as HTMLElement
+
+function buscarTipusPerCarregar(event: MouseEvent){
+    let targetClick=event.target
+    if (!(targetClick instanceof HTMLElement)) return;
+    let tipus=targetClick.getAttribute("data-type")
+    if(tipus===null) return;
+    carregarPokemonPerTipus(tipus)
+        .then()
+        .catch()
+        .finally()
+}
+
+async function carregarPokemonPerTipus(tipus:string){
+    Utils.mostrarEstat("Carregant Algo","loading")
+    try{
+        let resposta = await fetch("https://pokeapi.co/api/v2/type/{tipus}")
+        if(!resposta.ok){
+            throw new Error(`Error HTTP: ${resposta.status}`)
+        }
+        let data = await resposta.json() as Models.IPokeApiTypeResponse
+
+    }catch (error:unknown){
+
+    }finally {
+
+    }
+}
+
+
+
+
+
+typeFilterContainer.addEventListener("click",buscarTipusPerCarregar)

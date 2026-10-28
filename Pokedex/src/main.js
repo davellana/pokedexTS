@@ -115,15 +115,15 @@ async function carregarDetallPokemon(id, url) {
 }
 let llistaPokemon = document.getElementById("pokemon-list");
 function seleccionarPokemon(event) {
-    const target = event.target;
+    let target = event.target;
     if (!(target instanceof HTMLElement))
         return;
-    const li = target.closest("li");
+    let li = target.closest("li");
     if (!li)
         return;
     Utils.marcarItemActiu(li);
-    const id = Number(li.dataset.id);
-    const pokemon = mapaPokemon.get(id);
+    let id = Number(li.dataset.id);
+    let pokemon = mapaPokemon.get(id);
     if (pokemon) {
         carregarDetallPokemon(id, pokemon.url);
     }
@@ -140,4 +140,32 @@ Utils.generarBotonsTipus();
 // EXERCICI 5: Filtrar la llista per tipus
 // ==========================================================
 // TODO: Implementa la lògica de l'exercici 5 seguint els requisits
+let typeFilterContainer = document.getElementById("type-filter-container");
+function buscarTipusPerCarregar(event) {
+    let targetClick = event.target;
+    if (!(targetClick instanceof HTMLElement))
+        return;
+    let tipus = targetClick.getAttribute("data-type");
+    if (tipus === null)
+        return;
+    carregarPokemonPerTipus(tipus)
+        .then()
+        .catch()
+        .finally();
+}
+async function carregarPokemonPerTipus(tipus) {
+    Utils.mostrarEstat("Carregant Algo", "loading");
+    try {
+        let resposta = await fetch("https://pokeapi.co/api/v2/type/{tipus}");
+        if (!resposta.ok) {
+            throw new Error(`Error HTTP: ${resposta.status}`);
+        }
+        let data = await resposta.json();
+    }
+    catch (error) {
+    }
+    finally {
+    }
+}
+typeFilterContainer.addEventListener("click", buscarTipusPerCarregar);
 //# sourceMappingURL=main.js.map
