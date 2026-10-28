@@ -1,5 +1,6 @@
 import * as Models from "./models.js";
 import * as Utils from "./utils.js";
+import { BasePokemon } from "./models.js";
 // ==========================================================
 // EXERCICI 1: Llistar els 151 Pokémon
 // ==========================================================
@@ -9,6 +10,10 @@ let btnCarregar = document.getElementById("btn-show-all");
 async function carregarLlistaPokemon() {
     Utils.mostrarEstat("Carregant Pokemons", "loading");
     Utils.netejarCercador();
+    let botons = document.querySelectorAll("button");
+    botons.forEach((boto) => {
+        boto.classList.remove("active");
+    });
     try {
         let resposta = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
         if (!resposta.ok) {
@@ -28,7 +33,7 @@ async function carregarLlistaPokemon() {
             Utils.mostrarEstat(error.message, "error");
         }
         else {
-            Utils.mostrarEstat("ERROR DESCONOCIDO", "error");
+            Utils.mostrarEstat("Create new scratch file from selection", "error");
         }
     }
     finally {
@@ -109,7 +114,7 @@ async function carregarDetallPokemon(id, url) {
             Utils.mostrarEstat(error.message, "error");
         }
         else {
-            Utils.mostrarEstat("Error desconegut.", "error");
+            Utils.mostrarEstat("Error desconegut", "error");
         }
     }
 }
@@ -118,11 +123,8 @@ function seleccionarPokemon(event) {
     let target = event.target;
     if (!(target instanceof HTMLElement))
         return;
-    let li = target.closest("li");
-    if (!li)
-        return;
-    Utils.marcarItemActiu(li);
-    let id = Number(li.dataset.id);
+    Utils.marcarItemActiu(target);
+    let id = Number(target.dataset.id);
     let pokemon = mapaPokemon.get(id);
     if (pokemon) {
         carregarDetallPokemon(id, pokemon.url);
@@ -148,23 +150,44 @@ function buscarTipusPerCarregar(event) {
     let tipus = targetClick.getAttribute("data-type");
     if (tipus === null)
         return;
-    carregarPokemonPerTipus(tipus)
-        .then()
-        .catch()
-        .finally();
+    let botons = document.querySelectorAll("button");
+    botons.forEach((boto) => {
+        boto.classList.remove("active");
+    });
+    targetClick.classList.add("active");
+    carregarPokemonPerTipus(tipus);
 }
 async function carregarPokemonPerTipus(tipus) {
-    Utils.mostrarEstat("Carregant Algo", "loading");
+    Utils.mostrarEstat("Carregant Pokémons", "loading");
     try {
-        let resposta = await fetch("https://pokeapi.co/api/v2/type/{tipus}");
+        let resposta = await fetch(`https://pokeapi.co/api/v2/type/${tipus}`);
         if (!resposta.ok) {
             throw new Error(`Error HTTP: ${resposta.status}`);
         }
         let data = await resposta.json();
+        let pokemonsTipus = [];
+        for (let element of data.pokemon) {
+            let pokemon = new BasePokemon(element.pokemon);
+            if (pokemon.id <= 151) {
+                pokemonsTipus.push(pokemon);
+            }
+        }
+        mapaPokemon.clear();
+        for (let pokemon of pokemonsTipus) {
+            mapaPokemon.set(pokemon.id, pokemon);
+        }
+        Utils.renderitzarLlistaNoms(pokemonsTipus);
+        Utils.netejarCercador();
+        Utils.netejarDetallCard();
+        Utils.amagarEstat();
     }
     catch (error) {
-    }
-    finally {
+        if (error instanceof Error) {
+            Utils.mostrarEstat("Error en carregar els Pokémon: " + error.message, "error");
+        }
+        else {
+            Utils.mostrarEstat("Create new scratch file from selection", "error");
+        }
     }
 }
 typeFilterContainer.addEventListener("click", buscarTipusPerCarregar);

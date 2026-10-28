@@ -1,6 +1,7 @@
 import * as Models from "./models.js";
 import * as Utils from "./utils.js";
 import {renderitzarLlistaNoms} from "./utils.js";
+import {BasePokemon} from "./models.js";
 
 // ==========================================================
 // EXERCICI 1: Llistar els 151 Pokémon
@@ -13,6 +14,11 @@ let btnCarregar = document.getElementById("btn-show-all") as HTMLButtonElement
 async function carregarLlistaPokemon() {
     Utils.mostrarEstat("Carregant Pokemons", "loading")
     Utils.netejarCercador()
+    let botons = document.querySelectorAll("button")
+
+    botons.forEach((boto) => {
+        boto.classList.remove("active")
+    })
     try {
         let resposta = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151")
 
@@ -23,17 +29,17 @@ async function carregarLlistaPokemon() {
         let results:Models.IPokeApiListResponse = await resposta.json() as Models.IPokeApiListResponse
         //console.log(results.results)
         let i:number = 0
-        mapaPokemon.clear();
+        mapaPokemon.clear()
         for (let result of results.results) {
-            let pokemon = new Models.BasePokemon(result);
-            mapaPokemon.set(pokemon.id, pokemon);
+            let pokemon = new Models.BasePokemon(result)
+            mapaPokemon.set(pokemon.id, pokemon)
         }
 
     } catch (error: unknown) {
         if (error instanceof Error) {
             Utils.mostrarEstat(error.message, "error")
         } else {
-            Utils.mostrarEstat("ERROR DESCONOCIDO", "error")
+            Utils.mostrarEstat("Create new scratch file from selection", "error")
         }
     } finally {
         //console.log(mapaPokemon)
@@ -84,7 +90,6 @@ function canviBuscador() {
         Utils.renderitzarLlistaNoms(llistaPokemonsPerNom)
     }
 }
-
 inpBuscar.addEventListener("input",canviBuscador)
 
 // ==========================================================
@@ -92,70 +97,65 @@ inpBuscar.addEventListener("input",canviBuscador)
 // ==========================================================
 // TODO: Implementa la lògica de l'exercici 3 seguint els requisits
 
-let cachePokemon = new Map<number, Models.DetailedPokemon>();
+let cachePokemon = new Map<number, Models.DetailedPokemon>()
 
 async function carregarDetallPokemon(id: number, url: string): Promise<void> {
     if (cachePokemon.has(id)) {
-        let pokemon = cachePokemon.get(id);
+        let pokemon = cachePokemon.get(id)
 
         if (pokemon) {
-            Utils.renderitzarDetallCard(pokemon);
-            Utils.amagarEstat();
+            Utils.renderitzarDetallCard(pokemon)
+            Utils.amagarEstat()
         }
-        return;
+        return
     }
 
-    Utils.mostrarEstat("Carregant detall del Pokémon...", "loading");
+    Utils.mostrarEstat("Carregant detall del Pokémon...", "loading")
 
     try {
-        let resposta = await fetch(url);
+        let resposta = await fetch(url)
 
         if (!resposta.ok) {
-            throw new Error("No s'han pogut carregar les dades del Pokémon.");
+            throw new Error("No s'han pogut carregar les dades del Pokémon.")
         }
 
-        let data = await resposta.json() as Models.IPokeApiDetail;
+        let data = await resposta.json() as Models.IPokeApiDetail
 
-        let pokemon = new Models.DetailedPokemon(data, url);
+        let pokemon = new Models.DetailedPokemon(data, url)
 
-        cachePokemon.set(id, pokemon);
+        cachePokemon.set(id, pokemon)
 
-        Utils.renderitzarDetallCard(pokemon);
-        Utils.amagarEstat();
+        Utils.renderitzarDetallCard(pokemon)
+        Utils.amagarEstat()
 
     } catch (error: unknown) {
         if (error instanceof Error) {
-            Utils.mostrarEstat(error.message, "error");
+            Utils.mostrarEstat(error.message, "error")
         } else {
-            Utils.mostrarEstat("Error desconegut.", "error");
+            Utils.mostrarEstat("Error desconegut", "error")
         }
     }
 }
 
-
-let llistaPokemon = document.getElementById("pokemon-list");
+let llistaPokemon = document.getElementById("pokemon-list")
 
 function seleccionarPokemon(event: MouseEvent): void {
-    let target = event.target;
+    let target = event.target
 
-    if (!(target instanceof HTMLElement)) return;
+    if (!(target instanceof HTMLElement)) return
 
-    let li = target.closest("li");
+    Utils.marcarItemActiu(target)
 
-    if (!li) return;
-
-    Utils.marcarItemActiu(li);
-
-    let id = Number(li.dataset.id);
-    let pokemon = mapaPokemon.get(id);
+    let id = Number(target.dataset.id)
+    let pokemon = mapaPokemon.get(id)
 
     if (pokemon) {
-        carregarDetallPokemon(id, pokemon.url);
+        carregarDetallPokemon(id, pokemon.url)
     }
 }
 
 if (llistaPokemon) {
-    llistaPokemon.addEventListener("click", seleccionarPokemon);
+    llistaPokemon.addEventListener("click", seleccionarPokemon)
 }
 
 
@@ -180,25 +180,49 @@ function buscarTipusPerCarregar(event: MouseEvent){
     if (!(targetClick instanceof HTMLElement)) return;
     let tipus=targetClick.getAttribute("data-type")
     if(tipus===null) return;
+    let botons = document.querySelectorAll("button")
+
+    botons.forEach((boto) => {
+        boto.classList.remove("active")
+    })
+
+    targetClick.classList.add("active")
+
     carregarPokemonPerTipus(tipus)
-        .then()
-        .catch()
-        .finally()
 }
 
 async function carregarPokemonPerTipus(tipus:string){
-    Utils.mostrarEstat("Carregant Algo","loading")
+    Utils.mostrarEstat("Carregant Pokémons","loading")
     try{
-        let resposta = await fetch("https://pokeapi.co/api/v2/type/{tipus}")
+        let resposta = await fetch(`https://pokeapi.co/api/v2/type/${tipus}`)
         if(!resposta.ok){
             throw new Error(`Error HTTP: ${resposta.status}`)
         }
         let data = await resposta.json() as Models.IPokeApiTypeResponse
+        let pokemonsTipus: BasePokemon[] = []
+        for (let element of data.pokemon) {
+            let pokemon = new BasePokemon(element.pokemon)
+
+            if (pokemon.id <= 151) {
+                pokemonsTipus.push(pokemon)
+            }
+        }
+
+        mapaPokemon.clear()
+        for(let pokemon of pokemonsTipus){
+            mapaPokemon.set(pokemon.id,pokemon)
+        }
+        Utils.renderitzarLlistaNoms(pokemonsTipus)
+        Utils.netejarCercador()
+        Utils.netejarDetallCard()
+        Utils.amagarEstat()
 
     }catch (error:unknown){
-
-    }finally {
-
+        if (error instanceof Error) {
+            Utils.mostrarEstat("Error en carregar els Pokémon: " + error.message, "error")
+        } else {
+            Utils.mostrarEstat("Create new scratch file from selection", "error")
+        }
     }
 }
 
