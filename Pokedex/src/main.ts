@@ -14,18 +14,19 @@ async function carregarLlistaPokemon() {
     Utils.mostrarEstat("Carregant Pokemons", "loading")
     Utils.netejarCercador()
     try {
-        const resposta = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151")
+        let resposta = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151")
 
         if (!resposta.ok) {
             throw new Error(`Error HTTP: ${resposta.status}`)
         }
 
-        const results:Models.IPokeApiListResponse = await resposta.json() as Models.IPokeApiListResponse
+        let results:Models.IPokeApiListResponse = await resposta.json() as Models.IPokeApiListResponse
         //console.log(results.results)
         let i:number = 0
+        mapaPokemon.clear();
         for (let result of results.results) {
-            mapaPokemon.set(i,new Models.BasePokemon(result))
-            i++;
+            let pokemon = new Models.BasePokemon(result);
+            mapaPokemon.set(pokemon.id, pokemon);
         }
 
     } catch (error: unknown) {
@@ -92,6 +93,72 @@ inpBuscar.addEventListener("input",canviBuscador)
 // ==========================================================
 // TODO: Implementa la lògica de l'exercici 3 seguint els requisits
 
+let cachePokemon = new Map<number, Models.DetailedPokemon>();
+
+async function carregarDetallPokemon(id: number, url: string): Promise<void> {
+    if (cachePokemon.has(id)) {
+        let pokemon = cachePokemon.get(id);
+
+        if (pokemon) {
+            Utils.renderitzarDetallCard(pokemon);
+            Utils.amagarEstat();
+        }
+
+        return;
+    }
+
+    Utils.mostrarEstat("Carregant detall del Pokémon...", "loading");
+
+    try {
+        let resposta = await fetch(url);
+
+        if (!resposta.ok) {
+            throw new Error("No s'han pogut carregar les dades del Pokémon.");
+        }
+
+        let data = await resposta.json() as Models.IPokeApiDetail;
+
+        let pokemon = new Models.DetailedPokemon(data, url);
+
+        cachePokemon.set(id, pokemon);
+
+        Utils.renderitzarDetallCard(pokemon);
+        Utils.amagarEstat();
+
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            Utils.mostrarEstat(error.message, "error");
+        } else {
+            Utils.mostrarEstat("Error desconegut.", "error");
+        }
+    }
+}
+
+
+let llistaPokemon = document.getElementById("pokemon-list");
+
+function seleccionarPokemon(event: MouseEvent): void {
+    const target = event.target;
+
+    if (!(target instanceof HTMLElement)) return;
+
+    const li = target.closest("li");
+
+    if (!li) return;
+
+    Utils.marcarItemActiu(li);
+
+    const id = Number(li.dataset.id);
+    const pokemon = mapaPokemon.get(id);
+
+    if (pokemon) {
+        carregarDetallPokemon(id, pokemon.url);
+    }
+}
+
+if (llistaPokemon) {
+    llistaPokemon.addEventListener("click", seleccionarPokemon);
+}
 
 
 // ==========================================================

@@ -150,13 +150,29 @@ export class DetailedPokemon extends BasePokemon {
     _stats;
     _cryUrl;
     constructor(data, url) {
-        let supercons = { name: data.name, url: url };
-        super(supercons);
-        this._weightKg = data.weight;
+        super({ name: data.name, url: url });
+        this._weightKg = data.weight / 10;
         this._imageUrl = data.sprites.front_default ?? "";
-        this._types = data.types.map(t => t.type.name);
-        this._stats = data.stats.map(s => s.stat.name);
-        this._cryUrl = data.cries?.latest ?? data.cries?.legacy ?? "";
+        this._types = data.types
+            .map((t) => POKEMON_TYPES[t.type.name])
+            .filter((type) => type !== undefined);
+        this._stats = data.stats.map((s) => [s.stat.name, s.base_stat]);
+        this._cryUrl = data.cries?.latest || data.cries?.legacy || null;
+    }
+    get weightKg() {
+        return this._weightKg;
+    }
+    get imageUrl() {
+        return this._imageUrl;
+    }
+    get cryUrl() {
+        return this._cryUrl;
+    }
+    get types() {
+        return this._types;
+    }
+    get stats() {
+        return this._stats;
     }
 }
 //# sourceMappingURL=models.js.map

@@ -97,16 +97,25 @@ export function reproduirCrit(soundUrl: string): void {
  */
 // TODO: Implementa la lògica de l'exercici 1 seguint els requisits
 
-export function renderitzarLlistaNoms(llista: Models.BasePokemon[]) {
-    let pokeLista = document.getElementById("pokemon-list") as HTMLUListElement
-    pokeLista.innerHTML = ""
+
+export function renderitzarLlistaNoms(llista: Models.BasePokemon[]): void {
+    const pokeLista = document.getElementById("pokemon-list") as HTMLUListElement;
+
+    pokeLista.innerHTML = "";
 
     for (let e of llista) {
-        let li:HTMLLIElement = document.createElement("li")
-        li.innerHTML = "<strong>" + e.formattedId + "</strong> - " + e.displayName
-        pokeLista.appendChild(li)
+        const li = document.createElement("li");
+
+        li.dataset.id = String(e.id);
+        li.dataset.name = e.name;
+        li.dataset.url = e.url;
+
+        li.innerHTML = "<strong>" + e.formattedId + "</strong> - " + e.displayName;
+
+        pokeLista.appendChild(li);
     }
 }
+
 
 /**
  * EXERCICI 3
@@ -132,6 +141,59 @@ export function renderitzarLlistaNoms(llista: Models.BasePokemon[]) {
  */
 
 // TODO: Implementa la lògica de l'exercici 3 seguint els requisits
+
+
+export function renderitzarDetallCard(pokemon: Models.DetailedPokemon): void {
+    const container = document.getElementById("pokemon-detail");
+
+    if (!container) return;
+
+    let html = `<div class="detail-card"><h3>${pokemon.formattedId} - ${pokemon.displayName}</h3>`;
+
+    if (pokemon.imageUrl !== "") {
+        html += `<img src="${pokemon.imageUrl}" alt="${pokemon.displayName}">`;
+    }
+
+    if (pokemon.cryUrl !== null) {
+        html += `<button id="btn-play-cry" class="btn-cry">🔊 Escolta el crit</button>`;
+    }
+
+    html += `
+        <p><strong>Pes:</strong> ${pokemon.weightKg} kg</p>
+        <p>
+            <strong>Tipus:</strong>
+            ${pokemon.types.map(t => t.label).join(", ")}
+        </p>
+
+        <div class="stats-grid">
+    `;
+
+    for (let stat of pokemon.stats) {
+        html += `
+            <div class="stat-box">
+                <span>${stat[0]}</span>
+                <strong>${stat[1]}</strong>
+            </div>
+        `;
+    }
+
+    html += `
+        </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+
+    if (pokemon.cryUrl !== null) {
+        const btnCrit = document.getElementById("btn-play-cry");
+
+        if (btnCrit) {
+            btnCrit.addEventListener("click", () => {
+                reproduirCrit(pokemon.cryUrl as string);
+            });
+        }
+    }
+}
 
 
 /**

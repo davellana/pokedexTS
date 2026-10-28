@@ -83,10 +83,13 @@ export function reproduirCrit(soundUrl) {
  */
 // TODO: Implementa la lògica de l'exercici 1 seguint els requisits
 export function renderitzarLlistaNoms(llista) {
-    let pokeLista = document.getElementById("pokemon-list");
+    const pokeLista = document.getElementById("pokemon-list");
     pokeLista.innerHTML = "";
     for (let e of llista) {
-        let li = document.createElement("li");
+        const li = document.createElement("li");
+        li.dataset.id = String(e.id);
+        li.dataset.name = e.name;
+        li.dataset.url = e.url;
         li.innerHTML = "<strong>" + e.formattedId + "</strong> - " + e.displayName;
         pokeLista.appendChild(li);
     }
@@ -114,6 +117,48 @@ export function renderitzarLlistaNoms(llista) {
  *  - Un cop pintat l'HTML, afegeix el listener de clic al botó i crida reproduirCrit().
  */
 // TODO: Implementa la lògica de l'exercici 3 seguint els requisits
+export function renderitzarDetallCard(pokemon) {
+    const container = document.getElementById("pokemon-detail");
+    if (!container)
+        return;
+    let html = `<div class="detail-card"><h3>${pokemon.formattedId} - ${pokemon.displayName}</h3>`;
+    if (pokemon.imageUrl !== "") {
+        html += `<img src="${pokemon.imageUrl}" alt="${pokemon.displayName}">`;
+    }
+    if (pokemon.cryUrl !== null) {
+        html += `<button id="btn-play-cry" class="btn-cry">🔊 Escolta el crit</button>`;
+    }
+    html += `
+        <p><strong>Pes:</strong> ${pokemon.weightKg} kg</p>
+        <p>
+            <strong>Tipus:</strong>
+            ${pokemon.types.map(t => t.label).join(", ")}
+        </p>
+
+        <div class="stats-grid">
+    `;
+    for (let stat of pokemon.stats) {
+        html += `
+            <div class="stat-box">
+                <span>${stat[0]}</span>
+                <strong>${stat[1]}</strong>
+            </div>
+        `;
+    }
+    html += `
+        </div>
+        </div>
+    `;
+    container.innerHTML = html;
+    if (pokemon.cryUrl !== null) {
+        const btnCrit = document.getElementById("btn-play-cry");
+        if (btnCrit) {
+            btnCrit.addEventListener("click", () => {
+                reproduirCrit(pokemon.cryUrl);
+            });
+        }
+    }
+}
 /**
  * EXERCICI 4
  * Genera un botó per a cada tipus dins de <div id="type-filter-container">.
