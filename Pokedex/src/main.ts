@@ -166,6 +166,8 @@ if (llistaPokemon) {
 // ==========================================================
 // TODO: Implementa la lògica de l'exercici 4 seguint els requisits
 
+Utils.generarBotonsTipus();
+
 
 
 // ==========================================================
